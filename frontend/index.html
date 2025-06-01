@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Casino Login/Register</title>
+</head>
+<body>
+  <h2>Login or Register</h2>
+  <input id="username" placeholder="Username" />
+  <input id="password" placeholder="Password" type="password" />
+  <br />
+  <button onclick="register()">Register</button>
+  <button onclick="login()">Login</button>
+  <p id="message"></p>
+
+  <script>
+    async function register() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const res = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      message.innerText = data.message || 'Error';
+    }
+
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const res = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('balance', data.balance);
+        localStorage.setItem('isAdmin', data.isAdmin);
+        message.innerText = 'Login successful!';
+        setTimeout(() => {
+          window.location = 'dice.html';
+        }, 1000);
+      } else {
+        message.innerText = data.message || 'Login failed';
+      }
+    }
+  </script>
+</body>
+</html>

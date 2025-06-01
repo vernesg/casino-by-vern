@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+</head>
+<body>
+  <h2>Admin Panel</h2>
+  <input id="user" placeholder="Username" />
+  <input id="bal" placeholder="New Balance" type="number" />
+  <button onclick="setBalance()">Update Balance</button>
+  <ul id="userList"></ul>
+
+  <script>
+    async function setBalance() {
+      const username = document.getElementById('user').value;
+      const balance = parseInt(document.getElementById('bal').value);
+      const token = localStorage.getItem('token');
+      if (!username || isNaN(balance)) {
+        alert('Enter valid username and balance');
+        return;
+      }
+
+      await fetch('http://localhost:3000/api/admin/setbalance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ username, balance })
+      });
+      loadUsers();
+    }
+
+    async function loadUsers() {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:3000/api/admin/users', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const users = await res.json();
+      const userList = document.getElementById('userList');
+      userList.innerHTML = users.map(u => `<li>${u.username}: ${u.balance}</li>`).join('');
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
